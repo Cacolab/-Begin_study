@@ -1,0 +1,498 @@
+<!-- สำหรับการศึกษาการส่งข้อมูลแบบอนุกรมและขนาน แสดงการเปรียบเทียบระหว่างการส่งข้อความของการสื่อสื่อสารทั้งสองแบบ
+Weerachai S.  LPRU  Datacommunication
+wrchai.colab@gmail.com
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serial vs Parallel Data Transfer Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .demo-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .transfer-demo {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .transfer-demo h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+
+        .device {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .connection {
+            position: relative;
+            height: 100px;
+            margin: 20px 0;
+            background: #ecf0f1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .wire {
+            height: 8px;
+            margin: 2px 0;
+            background: #95a5a6;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .serial-wire {
+            height: 20px;
+            margin: 40px 0;
+        }
+
+        .data-bit {
+            width: 20px;
+            height: 100%;
+            background: #e74c3c;
+            border-radius: 3px;
+            position: absolute;
+            left: -25px;
+            transition: left 0.1s linear;
+        }
+
+        .parallel-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 100px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-right: 10px;
+        }
+
+        .connection-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .stats {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .stats h4 {
+            margin: 0 0 10px 0;
+            color: #3498db;
+        }
+
+        .comparison {
+            background: #f1c40f;
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .data-input {
+            margin-bottom: 20px;
+        }
+
+        .data-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .data-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .data-input input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .demo-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #e74c3c);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📡 Serial vs Parallel Data Transfer Demo</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="data-input">
+                    <label for="dataInput">Data to Transfer:</label>
+                    <input type="text" id="dataInput" value="HELLO" maxlength="10" placeholder="Enter data (max 10 chars)">
+                </div>
+            </div>
+            <div class="control-group">
+                <button id="startBtn">Start Comparison</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="transfer-demo">
+                <h3>🔄 Serial Transfer</h3>
+                <div class="device">Device A (Sender)</div>
+                
+                <div class="connection-container">
+                    <div class="connection">
+                        <div class="wire serial-wire">
+                            <div class="data-bit" id="serialBit"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="device">Device B (Receiver)</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="serialProgress"></div>
+                </div>
+                
+                <div class="stats">
+                    <h4>Serial Transfer Stats</h4>
+                    <div>Bits per wire: 1</div>
+                    <div>Current bit: <span id="serialCurrentBit">-</span></div>
+                    <div>Progress: <span id="serialProgressText">0%</span></div>
+                    <div>Time elapsed: <span id="serialTime">0</span>ms</div>
+                </div>
+            </div>
+
+            <div class="transfer-demo">
+                <h3>⚡ Parallel Transfer</h3>
+                <div class="device">Device A (Sender)</div>
+                
+                <div class="connection-container">
+                    <div class="parallel-labels">
+                        <div>Bit 7</div>
+                        <div>Bit 6</div>
+                        <div>Bit 5</div>
+                        <div>Bit 4</div>
+                        <div>Bit 3</div>
+                        <div>Bit 2</div>
+                        <div>Bit 1</div>
+                        <div>Bit 0</div>
+                    </div>
+                    <div class="connection">
+                        <div class="wire"><div class="data-bit" id="parallelBit7"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit6"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit5"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit4"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit3"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit2"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit1"></div></div>
+                        <div class="wire"><div class="data-bit" id="parallelBit0"></div></div>
+                    </div>
+                </div>
+                
+                <div class="device">Device B (Receiver)</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="parallelProgress"></div>
+                </div>
+                
+                <div class="stats">
+                    <h4>Parallel Transfer Stats</h4>
+                    <div>Bits per cycle: 8</div>
+                    <div>Current byte: <span id="parallelCurrentByte">-</span></div>
+                    <div>Progress: <span id="parallelProgressText">0%</span></div>
+                    <div>Time elapsed: <span id="parallelTime">0</span>ms</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison" id="comparison" style="display: none;">
+            <h3>🏆 Transfer Complete!</h3>
+            <div id="comparisonText"></div>
+        </div>
+    </div>
+
+    <script>
+        class DataTransferDemo {
+            constructor() {
+                this.data = '';
+                this.serialPosition = 0;
+                this.parallelPosition = 0;
+                this.serialStartTime = 0;
+                this.parallelStartTime = 0;
+                this.serialComplete = false;
+                this.parallelComplete = false;
+                this.isRunning = false;
+                
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startDemo());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetDemo());
+                document.getElementById('dataInput').addEventListener('input', (e) => {
+                    this.data = e.target.value.toUpperCase();
+                });
+            }
+
+            startDemo() {
+                if (this.isRunning) return;
+                
+                this.data = document.getElementById('dataInput').value.toUpperCase() || 'HELLO';
+                this.isRunning = true;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('comparison').style.display = 'none';
+                
+                this.serialStartTime = Date.now();
+                this.parallelStartTime = Date.now();
+                
+                this.runSerialTransfer();
+                this.runParallelTransfer();
+            }
+
+            runSerialTransfer() {
+                const totalBits = this.data.length * 8;
+                let currentBit = 0;
+                
+                const transferBit = () => {
+                    if (currentBit >= totalBits) {
+                        this.serialComplete = true;
+                        this.checkCompletion();
+                        return;
+                    }
+                    
+                    const charIndex = Math.floor(currentBit / 8);
+                    const bitIndex = currentBit % 8;
+                    const char = this.data[charIndex];
+                    const ascii = char.charCodeAt(0);
+                    const bit = (ascii >> (7 - bitIndex)) & 1;
+                    
+                    // Animate bit movement
+                    const bitElement = document.getElementById('serialBit');
+                    bitElement.style.left = '-25px';
+                    bitElement.style.background = bit ? '#e74c3c' : '#95a5a6';
+                    
+                    setTimeout(() => {
+                        bitElement.style.left = 'calc(100% + 5px)';
+                    }, 50);
+                    
+                    // Update stats
+                    document.getElementById('serialCurrentBit').textContent = `${char} bit ${bitIndex}`;
+                    const progress = ((currentBit + 1) / totalBits * 100).toFixed(1);
+                    document.getElementById('serialProgress').style.width = progress + '%';
+                    document.getElementById('serialProgressText').textContent = progress + '%';
+                    document.getElementById('serialTime').textContent = Date.now() - this.serialStartTime;
+                    
+                    currentBit++;
+                    setTimeout(transferBit, 200); // 200ms per bit
+                };
+                
+                transferBit();
+            }
+
+            runParallelTransfer() {
+                let currentChar = 0;
+                
+                const transferByte = () => {
+                    if (currentChar >= this.data.length) {
+                        this.parallelComplete = true;
+                        this.checkCompletion();
+                        return;
+                    }
+                    
+                    const char = this.data[currentChar];
+                    const ascii = char.charCodeAt(0);
+                    
+                    // Animate all 8 bits simultaneously
+                    for (let i = 0; i < 8; i++) {
+                        const bit = (ascii >> (7 - i)) & 1;
+                        const bitElement = document.getElementById(`parallelBit${7-i}`);
+                        bitElement.style.left = '-25px';
+                        bitElement.style.background = bit ? '#e74c3c' : '#95a5a6';
+                        
+                        setTimeout(() => {
+                            bitElement.style.left = 'calc(100% + 5px)';
+                        }, 50);
+                    }
+                    
+                    // Update stats
+                    document.getElementById('parallelCurrentByte').textContent = char;
+                    const progress = ((currentChar + 1) / this.data.length * 100).toFixed(1);
+                    document.getElementById('parallelProgress').style.width = progress + '%';
+                    document.getElementById('parallelProgressText').textContent = progress + '%';
+                    document.getElementById('parallelTime').textContent = Date.now() - this.parallelStartTime;
+                    
+                    currentChar++;
+                    setTimeout(transferByte, 400); // 400ms per byte (8 bits)
+                };
+                
+                transferByte();
+            }
+
+            checkCompletion() {
+                if (this.serialComplete && this.parallelComplete) {
+                    const serialTime = Date.now() - this.serialStartTime;
+                    const parallelTime = Date.now() - this.parallelStartTime;
+                    const speedup = (serialTime / parallelTime).toFixed(2);
+                    
+                    document.getElementById('comparison').style.display = 'block';
+                    document.getElementById('comparisonText').innerHTML = `
+                        <div>Serial Transfer: ${serialTime}ms</div>
+                        <div>Parallel Transfer: ${parallelTime}ms</div>
+                        <div>Parallel is ${speedup}x faster!</div>
+                        <div style="margin-top: 10px; font-size: 14px;">
+                            Serial sends 1 bit at a time, while parallel sends 8 bits simultaneously.
+                        </div>
+                    `;
+                    
+                    this.isRunning = false;
+                    document.getElementById('startBtn').disabled = false;
+                }
+            }
+
+            resetDemo() {
+                this.isRunning = false;
+                this.serialComplete = false;
+                this.parallelComplete = false;
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('comparison').style.display = 'none';
+                
+                // Reset serial elements
+                document.getElementById('serialBit').style.left = '-25px';
+                document.getElementById('serialCurrentBit').textContent = '-';
+                document.getElementById('serialProgress').style.width = '0%';
+                document.getElementById('serialProgressText').textContent = '0%';
+                document.getElementById('serialTime').textContent = '0';
+                
+                // Reset parallel elements
+                for (let i = 0; i < 8; i++) {
+                    document.getElementById(`parallelBit${i}`).style.left = '-25px';
+                }
+                document.getElementById('parallelCurrentByte').textContent = '-';
+                document.getElementById('parallelProgress').style.width = '0%';
+                document.getElementById('parallelProgressText').textContent = '0%';
+                document.getElementById('parallelTime').textContent = '0';
+            }
+        }
+
+        // Initialize the demo when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new DataTransferDemo();
+        });
+    </script>
+</body>
+</html>
