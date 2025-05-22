@@ -1,0 +1,163 @@
+/* General Page Layout */
+body {
+    font-family: Arial, sans-serif; /* Clear and readable font */
+    margin: 20px;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1 {
+    text-align: center; /* Center the main title */
+    color: #333;
+}
+
+.container {
+    display: flex; /* Arrange sections side-by-side */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: space-around;
+}
+
+section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px;
+    flex: 1; /* Allow sections to grow */
+    min-width: 400px; /* Minimum width before wrapping */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Input and Buttons */
+input[type="text"] {
+    width: calc(100% - 22px); /* Full width minus padding and border */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc; /* Grey background for disabled state */
+    color: #666666;      /* Darker grey text */
+    cursor: not-allowed;   /* Indicate non-interactive state */
+}
+
+/* Binary Representation Divs */
+#serial-binary-representation,
+#parallel-binary-representation {
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+    background-color: #e9e9e9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    min-height: 20px; /* Ensure it's visible even when empty */
+    word-wrap: break-word; /* Wrap long binary strings */
+}
+
+/* Visualization Areas */
+#serial-visualization,
+#parallel-visualization {
+    width: 100%; /* Full width of the section */
+    height: 200px; /* Fixed height */
+    border: 2px solid #333; /* Clearly define the transfer areas */
+    background-color: #f0f0f0; /* Background color for these areas */
+    margin-top: 10px;
+    padding: 10px; /* Add some padding inside */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    overflow: hidden; /* Hide bits that might overflow during animation */
+    position: relative; /* For positioning bits if needed later */
+}
+
+/* Transfer Channels */
+/* Serial Transfer Channel */
+.serial-channel {
+    height: 10px; /* Thickness of the serial line */
+    background-color: #555; /* Color of the serial line */
+    width: 100%; /* Full width of the visualization area */
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%); /* Center vertically */
+}
+
+/* Parallel Transfer Channels */
+.parallel-channel-container { /* This will be the #parallel-visualization div */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; /* Distribute channels evenly */
+    height: 100%; /* Take full height of the container */
+}
+
+.parallel-channel {
+    height: 8px; /* Thickness of each parallel line */
+    background-color: #555; /* Color of the parallel lines */
+    width: 100%; /* Full width of the visualization area */
+    /* Margin is handled by justify-content in the container */
+}
+
+/* Data Bits Styling (for dynamic addition via JavaScript) */
+.data-bit {
+    width: 20px; /* Small square */
+    height: 20px; /* Small square */
+    background-color: #007bff; /* Clear background color (e.g., blue) */
+    color: white; /* Text color for the bit value (0 or 1) */
+    border: 1px solid #0056b3; /* Border for the bit */
+    border-radius: 3px; /* Slightly rounded corners for a softer look */
+    display: inline-flex; /* Use flex to center content easily */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    font-size: 12px;
+    font-weight: bold;
+    margin: 2px; /* Spacing between bits */
+    position: absolute; /* For animation within visualization areas */
+    /* Transition for smooth movement (optional, can be added in JS) */
+    /* transition: left 0.5s ease-out; */
+}
+
+/* Specific styling for bits in serial visualization for horizontal layout */
+#serial-visualization .data-bit {
+    /* top: 50%; transform: translateY(-50%); */ /* Align with the channel, will be set by JS */
+}
+
+/* Specific styling for bits in parallel visualization - might not be needed if bits are appended to channels */
+#parallel-visualization .data-bit {
+    /* position: static; */ /* If appended directly to channels, otherwise absolute like serial */
+}
+
+/* Status Messages */
+.status-message {
+    margin-top: 10px;
+    padding: 8px;
+    min-height: 1.2em; /* Ensure space even when empty */
+    font-style: italic;
+    color: #333; /* Default text color */
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    text-align: center;
+}

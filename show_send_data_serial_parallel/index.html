@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serial vs Parallel Data Transfer Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Serial vs Parallel Data Transfer Simulation</h1>
+
+    <div class="container">
+        <section id="serial-section">
+            <h2>Serial Transfer</h2>
+            <input type="text" id="serial-input" placeholder="Enter data for serial transfer">
+            <button id="serial-start-button">Start Serial Transfer</button>
+            <div id="serial-binary-representation"></div>
+            <div id="serial-visualization">
+                <div class="serial-channel"></div>
+            </div>
+            <div id="serial-status" class="status-message"></div>
+        </section>
+
+        <section id="parallel-section">
+            <h2>Parallel Transfer</h2>
+            <input type="text" id="parallel-input" placeholder="Enter data for parallel transfer">
+            <button id="parallel-start-button">Start Parallel Transfer</button>
+            <div id="parallel-binary-representation"></div>
+            <div id="parallel-visualization">
+                <!-- Parallel channels (e.g., 8 lines) will be added here by script.js 
+                     or could be pre-defined if a fixed number is always used. -->
+            </div>
+            <div id="parallel-status" class="status-message"></div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
